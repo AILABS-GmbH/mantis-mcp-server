@@ -79,6 +79,8 @@ the full list.
 | `MANTIS_CA_BUNDLE`      |    no    | —       | Path to a CA bundle for internal certificates.         |
 | `MANTIS_CONNECT_TIMEOUT`|    no    | `5`     | Connection timeout in seconds.                         |
 | `MANTIS_TIMEOUT`        |    no    | `30`    | Total request timeout in seconds.                      |
+| `MANTIS_IMPERSONATION_ENABLED` | no | `false` | Allow acting on behalf of another Mantis user.    |
+| `MANTIS_DEFAULT_USER`   |    no    | —       | Fallback user when no `X-Mantis-User` header is sent.  |
 | `MCP_AUTH_TOKEN`        |    no    | —       | Bearer token required on the MCP endpoint.             |
 | `MCP_ALLOWED_ORIGINS`   |    no    | —       | Comma-separated Origin allow-list.                     |
 | `MCP_SESSION_TTL`       |    no    | `3600`  | Session lifetime (inactivity) in seconds.              |
@@ -153,6 +155,36 @@ claude mcp add --transport http mantis http://127.0.0.1:8088/ \
 
 The `Authorization` header is only required when `MCP_AUTH_TOKEN` is set.
 
+## Acting as a specific Mantis user (impersonation)
+
+The MantisBT REST API does **not** support HTTP Basic Auth — authentication is
+always via a personal API token, and that token *is* the acting user. To
+attribute actions to a different Mantis user, MantisBT provides **impersonation**:
+a token whose owner has sufficient access (`impersonate_user_threshold`,
+typically an administrator) can act as another user via the `Mantis-Username`
+header. The impersonated user's password is **not** required.
+
+This server wires that up as follows:
+
+1. Set `MANTIS_IMPERSONATION_ENABLED=true` and use an administrator API token in
+   `MANTIS_API_TOKEN`.
+2. Have the MCP client send the target user in the `X-Mantis-User` request
+   header. The server validates it (no control characters) and forwards it as
+   `Mantis-Username` to Mantis.
+3. Optionally set `MANTIS_DEFAULT_USER` as a fallback when no header is sent.
+
+```bash
+curl -s -X POST http://127.0.0.1:8088/ \
+  -H 'Content-Type: application/json' \
+  -H 'Mcp-Session-Id: <session>' \
+  -H 'X-Mantis-User: jdoe' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
+       "params":{"name":"mantis_create_issue","arguments":{ ... }}}'
+```
+
+When impersonation is **disabled**, any incoming `X-Mantis-User` header is
+ignored (and logged) — the server never impersonates silently.
+
 ## Security notes
 
 - In production, always keep `MANTIS_VERIFY_TLS=true` and serve the endpoint
@@ -163,6 +195,9 @@ The `Authorization` header is only required when `MCP_AUTH_TOKEN` is set.
   masked automatically, but still restrict access to the directory.
 - `var/sessions/` and `logs/` must **not** be reachable through the web server —
   only `public/` should be published.
+- Impersonation uses a **privileged** administrator token. When enabled, anyone
+  who can reach the endpoint and pass `X-Mantis-User` can act as any user —
+  always combine it with `MCP_AUTH_TOKEN` and/or network-level restrictions.
 
 ## Contributing
 

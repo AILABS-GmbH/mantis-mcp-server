@@ -30,6 +30,10 @@ final class MantisClient
         private readonly ?string $caBundle = null,
         private readonly int $connectTimeout = 5,
         private readonly int $timeout = 30,
+        // Optional Mantis username to impersonate. Requires the configured
+        // token to belong to a user with sufficient access
+        // (impersonate_user_threshold). Sent as the "Mantis-Username" header.
+        private readonly ?string $impersonateUser = null,
     ) {
         $this->apiBase = rtrim($baseUrl, '/') . '/api/rest';
     }
@@ -92,6 +96,13 @@ final class MantisClient
             'Authorization: ' . $this->apiToken,
             'Accept: application/json',
         ];
+
+        // Act on behalf of another Mantis user (impersonation). The value is
+        // validated upstream (no control characters), so it is safe to add
+        // as a header here.
+        if ($this->impersonateUser !== null && $this->impersonateUser !== '') {
+            $headers[] = 'Mantis-Username: ' . $this->impersonateUser;
+        }
 
         $options = [
             CURLOPT_URL => $url,

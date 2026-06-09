@@ -61,6 +61,32 @@ if ($baseUrl === '' || $apiToken === '') {
     return;
 }
 
+// --- Optional impersonation (act as a specific Mantis user) -----------------
+// The MantisBT REST API has no Basic Auth; instead a privileged token can act
+// on behalf of another user via the "Mantis-Username" header. When enabled,
+// the target user is taken from the incoming "X-Mantis-User" request header,
+// falling back to MANTIS_DEFAULT_USER. The username is validated to prevent
+// header injection.
+$impersonateUser = null;
+if ($config->getBool('MANTIS_IMPERSONATION_ENABLED', false)) {
+    $headerUser = $_SERVER['HTTP_X_MANTIS_USER'] ?? '';
+    $headerUser = is_string($headerUser) ? trim($headerUser) : '';
+    $candidate = $headerUser !== '' ? $headerUser : $config->getString('MANTIS_DEFAULT_USER');
+
+    if ($candidate !== '') {
+        // Reject control characters (CR/LF etc.) and overly long values.
+        if (preg_match('/^[^\x00-\x1f\x7f]{1,255}$/', $candidate)) {
+            $impersonateUser = $candidate;
+            $logger->info('Impersonation active', ['mantis_user' => $impersonateUser]);
+        } else {
+            $logger->warning('Rejected impersonation username (invalid characters)');
+        }
+    }
+} elseif (!empty($_SERVER['HTTP_X_MANTIS_USER'])) {
+    // Fail safe: never impersonate silently when the feature is disabled.
+    $logger->warning('X-Mantis-User header ignored (impersonation disabled)');
+}
+
 // --- Mantis client -----------------------------------------------------------
 $mantis = new MantisClient(
     baseUrl: $baseUrl,
@@ -70,6 +96,7 @@ $mantis = new MantisClient(
     caBundle: $config->getString('MANTIS_CA_BUNDLE') ?: null,
     connectTimeout: $config->getInt('MANTIS_CONNECT_TIMEOUT', 5),
     timeout: $config->getInt('MANTIS_TIMEOUT', 30),
+    impersonateUser: $impersonateUser,
 );
 
 // --- Register tools ----------------------------------------------------------
