@@ -1,0 +1,8 @@
+/vendor/
+/logs/*.log
+/var/sessions/*
+!/var/sessions/.gitkeep
+.env
+.env.local
+*.local.php
+.DS_Store
