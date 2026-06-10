@@ -5,8 +5,19 @@
 [![MCP](https://img.shields.io/badge/MCP-Streamable%20HTTP-2ea44f.svg)](https://modelcontextprotocol.io/)
 
 A lightweight, secure and well-structured **Model Context Protocol (MCP) server**
-written in **PHP** for the **MantisBT** bug tracker. It exposes the MantisBT REST
-API as MCP tools so that an LLM can read, create, update and comment on issues.
+written in **PHP** for the **MantisBT** bug tracker, so that an LLM can read,
+create, update and comment on issues.
+
+## Two deployment variants
+
+| | Variant | For | Auth |
+|---|---------|-----|------|
+| 📡 | **Standalone server** (this page) | Mantis **2.x** with REST API; runs as its own service | Mantis API token (+ optional impersonation) |
+| 🧩 | **[Host extension](extension/README.md)** (`extension/`) | Mantis **1.2.x** (no REST API); deployed inside the Mantis installation at `/api/mcp/` | **HTTP Basic Auth per user** against Mantis' own account database |
+
+The tool names and schemas are identical in both variants, so MCP clients can
+switch between them transparently. The rest of this page documents the
+standalone server; for the extension see [extension/README.md](extension/README.md).
 
 ---
 
