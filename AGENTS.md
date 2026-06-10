@@ -4,20 +4,16 @@ Guidance for AI coding agents (and humans) working in this repository.
 
 ## What this project is
 
-A PHP implementation of an **MCP (Model Context Protocol) server** for the
-**MantisBT** bug tracker, in two deployment variants:
+A PHP implementation of an **MCP (Model Context Protocol) server** that exposes
+the **MantisBT 2.x** REST API as MCP tools. Transport is **Streamable HTTP**
+(JSON-RPC 2.0 over HTTP). The single web-exposed entry point is
+[`public/index.php`](public/index.php).
 
-1. **Standalone server** (`src/`, `public/index.php`) — talks to the Mantis
-   **2.x REST API** with an API token; header-based MCP sessions.
-2. **Host extension** (`extension/`) — deployed inside a Mantis **1.2.x**
-   installation at `/api/mcp/`; bootstraps Mantis' own `core.php` and calls
-   the core APIs directly; **HTTP Basic Auth per user**, stateless (no
-   sessions at all). All Mantis core calls were verified against the
-   MantisBT 1.2.8 source. Test without a Mantis install via
-   `MANTIS_MCP_CORE_PATH=tests/mock-mantis-core.php php -S ... -t extension`.
-
-Transport in both: JSON-RPC 2.0 over HTTP POST. Tool names/schemas are
-identical in both variants — keep them in sync when changing either.
+A sibling project,
+[AILABS-GmbH/mantis-mcp-extension](https://github.com/AILABS-GmbH/mantis-mcp-extension),
+targets Mantis **1.2.x** by running inside the Mantis installation with
+per-user Basic Auth. Tool names and input schemas must stay identical across
+both repositories — keep them in sync when changing either.
 
 ## Golden rules
 

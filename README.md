@@ -12,12 +12,13 @@ create, update and comment on issues.
 
 | | Variant | For | Auth |
 |---|---------|-----|------|
-| 📡 | **Standalone server** (this page) | Mantis **2.x** with REST API; runs as its own service | Mantis API token (+ optional impersonation) |
-| 🧩 | **[Host extension](extension/README.md)** (`extension/`) | Mantis **1.2.x** (no REST API); deployed inside the Mantis installation at `/api/mcp/` | **HTTP Basic Auth per user** against Mantis' own account database |
+| 📡 | **Standalone server** (this repository) | Mantis **2.x** with REST API; runs as its own service | Mantis API token (+ optional impersonation) |
+| 🧩 | **[Host extension](https://github.com/AILABS-GmbH/mantis-mcp-extension)** (separate repository) | Mantis **1.2.x** (no REST API); deployed inside the Mantis installation at `/api/mcp/` | **HTTP Basic Auth per user** against Mantis' own account database |
 
 The tool names and schemas are identical in both variants, so MCP clients can
-switch between them transparently. The rest of this page documents the
-standalone server; for the extension see [extension/README.md](extension/README.md).
+switch between them transparently. This page documents the standalone server;
+for the extension see
+[AILABS-GmbH/mantis-mcp-extension](https://github.com/AILABS-GmbH/mantis-mcp-extension).
 
 ---
 

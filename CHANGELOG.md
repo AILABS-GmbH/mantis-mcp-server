@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-10
+
+### Changed
+- The host extension for MantisBT 1.2.x moved to its own repository:
+  [AILABS-GmbH/mantis-mcp-extension](https://github.com/AILABS-GmbH/mantis-mcp-extension).
+  The `extension/` directory and the 1.2.8 core mock were removed here.
+
 ## [1.1.0] - 2026-06-10
 
 ### Added
@@ -35,5 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional bearer-token auth and Origin allow-list for the MCP endpoint.
 - PSR-4 fallback autoloader so the server runs without Composer.
 
+[1.2.0]: https://github.com/AILABS-GmbH/mantis-mcp-server/releases/tag/v1.2.0
 [1.1.0]: https://github.com/AILABS-GmbH/mantis-mcp-server/releases/tag/v1.1.0
 [1.0.0]: https://github.com/AILABS-GmbH/mantis-mcp-server/releases/tag/v1.0.0
